@@ -59,8 +59,6 @@ void switch_to(NSString* imId){
     // slow but ensure to work
     runScript(@"tell application \"System Events\" to keystroke \"z\" using {shift down, control down}");
     return;
-
-    }
 }
 
 void active(){
