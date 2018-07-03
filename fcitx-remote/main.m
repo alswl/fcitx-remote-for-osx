@@ -52,52 +52,14 @@ NSString* get_current_imname(){
 }
 
 void switch_to(NSString* imId){
-    if ([GENERAL_KEYBOARD_LAYOUT isEqualToString:CHINESE_KEYBOARD_LAYOUT]) {
-        if ([get_current_imname() isEqualToString:imId]) {
-            return;
-        }
-        // use ctrl-shift-z to change input method
-        // slow but ensure to work
-        runScript(@"tell application \"System Events\" to keystroke \"z\" using {shift down, control down}");
-        return;
-
-        // faster but not reliable
-        /*
-        CGEventSourceRef source = CGEventSourceCreate(kCGEventSourceStateHIDSystemState);
-        CGEventRef down = CGEventCreateKeyboardEvent(source, kVK_ANSI_Z, true);
-        CGEventRef up = CGEventCreateKeyboardEvent(source, kVK_ANSI_Z, false);
-        
-        int flag = kCGEventFlagMaskShift | kCGEventFlagMaskControl;
-        CGEventSetFlags(down, flag);
-        CGEventSetFlags(up, flag);
-        CGEventPost(kCGHIDEventTap, down);
-        CGEventPost(kCGHIDEventTap, up);
-        return;
-         */
+    if ([get_current_imname() isEqualToString:imId]) {
+    	return;
     }
-    
-    CFArrayRef keyboards = TISCreateInputSourceList(nil, false);
-    if (keyboards) {
-        NSArray *array = CFBridgingRelease(keyboards);
-        NSArray *filteredArray = [array filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id object, NSDictionary *bindings) {
-            TISInputSourceRef inputSource = (__bridge TISInputSourceRef)(object);
-            CFStringRef category = TISGetInputSourceProperty(inputSource, kTISPropertyInputSourceCategory);
-            CFBooleanRef selectable = TISGetInputSourceProperty(inputSource, kTISPropertyInputSourceIsSelectCapable);
-            return CFEqual(category, kTISCategoryKeyboardInputSource) && CFBooleanGetValue(selectable);
-        }]];
-        int index = 0;
-        for (id object in filteredArray) {
-            TISInputSourceRef inputSource = (__bridge TISInputSourceRef)(object);
-            NSString *name = (__bridge NSString*)TISGetInputSourceProperty(inputSource, kTISPropertyInputSourceID);
-            if ([name isEqualTo: imId]) {
-                TISInputSourceRef inputSource = (__bridge TISInputSourceRef)filteredArray[index];
-                NSString *name = (__bridge NSString*)TISGetInputSourceProperty(inputSource, kTISPropertyInputSourceID);
-                NSLog(@"Changing to %@", name);
-                TISSelectInputSource((__bridge TISInputSourceRef)filteredArray[index]);
-            }
-            index++;
-        }
-        
+    // use ctrl-shift-z to change input method
+    // slow but ensure to work
+    runScript(@"tell application \"System Events\" to keystroke \"z\" using {shift down, control down}");
+    return;
+
     }
 }
 
